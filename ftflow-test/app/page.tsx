@@ -68,8 +68,11 @@ export default function Home() {
 
   return (
     <div className={styles.container} suppressHydrationWarning>
+      <div className={styles.leftFade}></div>
+      <div className={styles.rightFade}></div>
       <div ref={boxRef} id="blue-box" className={styles.blueBox}></div>
       <div className={styles.gradientLine}></div>
+      <div className={styles.arcedBox}></div>
       <button onClick={toggleAnimation} className={styles.button}>
         {isPaused ? 'Play' : 'Pause'}
       </button>
