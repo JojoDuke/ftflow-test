@@ -7,39 +7,43 @@ import styles from './page.module.css'
 
 export default function Home() {
   const [isPaused, setIsPaused] = useState(true);
-  const boxRef = useRef<HTMLDivElement>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
   const animation = useRef<gsap.core.Tween | null>(null);
 
   useGSAP(() => {
-    if (boxRef.current) {
-      gsap.set(boxRef.current, { x: 0, backgroundColor: '#888', filter: 'blur(8px)', opacity: 0.4 });
-      const boxWidth = 100;
+    if (dotRef.current) {
+      const dotSize = 50;
       const leftMargin = 20;
+      gsap.set(dotRef.current, { x: -dotSize - leftMargin, backgroundColor: '#888', filter: 'blur(8px)', opacity: 0.4 });
       const updateAnimation = () => {
-        const distance = window.innerWidth - boxWidth - leftMargin;
-        const center = distance / 2;
+        const distance = window.innerWidth - dotSize - leftMargin;
+        const endX = distance + dotSize + leftMargin;
         if (animation.current) animation.current.kill();
-        animation.current = gsap.to(boxRef.current, {
-          x: distance,
+        gsap.set(dotRef.current, { x: -dotSize - leftMargin });
+        animation.current = gsap.to(dotRef.current, {
+          x: endX,
           duration: 3,
           repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut',
+          yoyo: false,
+          ease: 'power1.in',
           paused: isPaused,
+          onRepeat: function() {
+            if (dotRef.current) {
+              gsap.set(dotRef.current, { x: -dotSize - leftMargin });
+            }
+          },
           onUpdate: function() {
-            if (!boxRef.current) return;
-            // Get current x position
-            const x = gsap.getProperty(boxRef.current, 'x');
+            if (!dotRef.current) return;
+            const x = gsap.getProperty(dotRef.current, 'x');
             if (typeof x === 'number') {
-              if (x < center) {
-                gsap.set(boxRef.current, {
+              if (x < distance / 2) {
+                gsap.set(dotRef.current, {
                   backgroundColor: '#888',
                   filter: 'blur(8px)',
                   opacity: 0.4
                 });
               } else {
-                // Animate to blue, clear, and full opacity
-                gsap.set(boxRef.current, {
+                gsap.set(dotRef.current, {
                   backgroundColor: 'blue',
                   filter: 'blur(0px)',
                   opacity: 1
@@ -70,7 +74,7 @@ export default function Home() {
     <div className={styles.container} suppressHydrationWarning>
       <div className={styles.leftFade}></div>
       <div className={styles.rightFade}></div>
-      <div ref={boxRef} id="blue-box" className={styles.blueBox}></div>
+      <div ref={dotRef} id="blue-dot" className={styles.blueDot}></div>
       <div className={styles.gradientLine}></div>
       <div className={styles.arcedBox}></div>
       <button onClick={toggleAnimation} className={styles.button}>
